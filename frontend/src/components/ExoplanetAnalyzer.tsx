@@ -4,10 +4,15 @@ import UserFeedback from './UserFeedback';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Info } from 'lucide-react';
 import { Card } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 type Mode = 'simple' | 'advanced';
 
@@ -17,6 +22,23 @@ const features = [
   'koi_depth', 'koi_prad', 'koi_teq', 'koi_insol',
   'koi_model_snr', 'koi_steff', 'koi_slogg', 'koi_srad', 'ra', 'dec'
 ];
+
+const featureDetails: Record<string, string> = {
+    'koi_period': 'Orbital period of the candidate in days.',
+    'koi_time0bk': 'Time of first transit center in BKJD (Barycentric Kepler Julian Date).',
+    'koi_impact': 'Impact parameter of the transit.',
+    'koi_duration': 'Duration of the transit in hours.',
+    'koi_depth': 'Depth of the transit in parts per million (ppm).',
+    'koi_prad': 'Planet radius in Earth radii.',
+    'koi_teq': 'Equilibrium temperature of the planet in Kelvin.',
+    'koi_insol': 'Insolation flux in Earth flux units.',
+    'koi_model_snr': 'Signal-to-noise ratio of the transit model fit.',
+    'koi_steff': 'Stellar effective temperature in Kelvin.',
+    'koi_slogg': 'Stellar surface gravity in cgs units.',
+    'koi_srad': 'Stellar radius in Solar radii.',
+    'ra': 'Right Ascension of the star in degrees.',
+    'dec': 'Declination of the star in degrees.'
+};
 
 const featureDefaults: Record<string, number> = {
   koi_period: 18.2,
@@ -180,7 +202,19 @@ const ExoplanetAnalyzer = () => {
             <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {features.map(feature => (
                 <div key={feature}>
-                  <Label htmlFor={feature} className="text-foreground text-sm">{feature}</Label>
+                  <div className="flex items-center">
+                    <Label htmlFor={feature} className="text-foreground text-sm">{feature}</Label>
+                    <HoverCard>
+                      <HoverCardTrigger asChild>
+                        <Button variant="ghost" size="icon" className="w-6 h-6 ml-1">
+                          <Info className="h-4 w-4" />
+                        </Button>
+                      </HoverCardTrigger>
+                      <HoverCardContent className="w-80">
+                        <p>{featureDetails[feature]}</p>
+                      </HoverCardContent>
+                    </HoverCard>
+                  </div>
                   <Input
                     id={feature}
                     type="text"

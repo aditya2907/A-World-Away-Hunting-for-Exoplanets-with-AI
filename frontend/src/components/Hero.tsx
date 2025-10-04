@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Telescope } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Hero = () => {
   const scrollToAnalyzer = () => {
@@ -41,13 +42,15 @@ const Hero = () => {
           >
             Start Detection
           </Button>
-          <Button 
-            size="lg" 
-            variant="outline"
-            className="border-primary/30 hover:bg-primary/10"
-          >
-            Learn More
-          </Button>
+          <Link to="/about">
+            <Button 
+              size="lg" 
+              variant="outline"
+              className="border-primary/30 hover:bg-primary/10"
+            >
+              Learn More
+            </Button>
+          </Link>
         </div>
 
         {/* Stats */}
