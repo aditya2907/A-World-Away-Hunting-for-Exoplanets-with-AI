@@ -58,18 +58,18 @@ export const generateFoldedCurve = (period: number = 3.5) => {
 
 // Mock star candidates
 export const mockStarCandidates = [
-  { id: 'KIC-11904151', name: 'KIC-11904151', mission: 'Kepler', confidence: 0.96 },
-  { id: 'TIC-307210830', name: 'TIC-307210830', mission: 'TESS', confidence: 0.89 },
-  { id: 'KIC-8462852', name: 'KIC-8462852 (Tabby\'s Star)', mission: 'Kepler', confidence: 0.42 },
-  { id: 'TIC-168789840', name: 'TIC-168789840', mission: 'TESS', confidence: 0.78 },
-  { id: 'KIC-12557548', name: 'KIC-12557548', mission: 'Kepler', confidence: 0.91 },
-  { id: 'TIC-400799224', name: 'TIC-400799224', mission: 'TESS', confidence: 0.15 },
+  { id: 'KIC-11904151', name: 'KIC-11904151', mission: 'Kepler', confidence: 0.96, features: { 'kepid': 11904151, 'koi_fpflag_nt': 0, 'koi_fpflag_ss': 0, 'koi_fpflag_co': 0, 'koi_fpflag_ec': 0, 'koi_period': 0.259862, 'koi_time0bk': 131.56308, 'koi_duration': 1.781, 'ra': 292.247, 'dec': 50.2413, 'koi_pdisposition': 'CANDIDATE' } },
+  { id: 'TIC-307210830', name: 'TIC-307210830', mission: 'TESS', confidence: 0.23, features: { 'kepid': 307210830, 'koi_fpflag_nt': 0, 'koi_fpflag_ss': 0, 'koi_fpflag_co': 1, 'koi_fpflag_ec': 1, 'koi_period': 3.5225, 'koi_time0bk': 133.56, 'koi_duration': 3.19, 'ra': 295.64, 'dec': 48.49, 'koi_pdisposition': 'FALSE POSITIVE' } },
+  { id: 'KIC-8462852', name: 'KIC-8462852 (Tabby\'s Star)', mission: 'Kepler', confidence: 0.42, features: { 'kepid': 8462852, 'koi_fpflag_nt': 0, 'koi_fpflag_ss': 0, 'koi_fpflag_co': 0, 'koi_fpflag_ec': 0, 'koi_period': 780, 'koi_time0bk': 1500, 'koi_duration': 5, 'ra': 301.56, 'dec': 44.45, 'koi_pdisposition': 'CANDIDATE' } },
+  { id: 'TIC-168789840', name: 'TIC-168789840', mission: 'TESS', confidence: 0.98, features: { 'kepid': 168789840, 'koi_fpflag_nt': 0, 'koi_fpflag_ss': 0, 'koi_fpflag_co': 0, 'koi_fpflag_ec': 0, 'koi_period': 11.8, 'koi_time0bk': 134.45, 'koi_duration': 2.4, 'ra': 289.27, 'dec': 40.05, 'koi_pdisposition': 'CONFIRMED' } },
+  { id: 'KIC-12557548', name: 'KIC-12557548', mission: 'Kepler', confidence: 0.91, features: { 'kepid': 12557548, 'koi_fpflag_nt': 0, 'koi_fpflag_ss': 0, 'koi_fpflag_co': 0, 'koi_fpflag_ec': 0, 'koi_period': 0.6535, 'koi_time0bk': 131.56, 'koi_duration': 1.2, 'ra': 290.0, 'dec': 51.3, 'koi_pdisposition': 'CONFIRMED' } },
+  { id: 'TIC-400799224', name: 'TIC-400799224', mission: 'TESS', confidence: 0.15, features: { 'kepid': 400799224, 'koi_fpflag_nt': 1, 'koi_fpflag_ss': 1, 'koi_fpflag_co': 1, 'koi_fpflag_ec': 1, 'koi_period': 1.2, 'koi_time0bk': 131.9, 'koi_duration': 0.5, 'ra': 299.5, 'dec': 45.7, 'koi_pdisposition': 'FALSE POSITIVE' } },
 ];
 
 // Predict if light curve contains a planet
 export const predictPlanet = (starId: string): { confidence: number; isPlanet: boolean } => {
   const star = mockStarCandidates.find(s => s.id === starId);
-  const confidence = star?.confidence ?? 0.5;
+  const confidence = star?.features.koi_pdisposition === 'FALSE POSITIVE' ? 0.2 : 0.9;
   
   return {
     confidence,

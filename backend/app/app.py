@@ -1,64 +1,83 @@
-from flask import Flask, request, jsonify
-from joblib import load
-import pandas as pd
-import numpy as np
-from flask_cors import CORS
+from flask import Flask, request, jsonify # type: ignore
+from joblib import load # type: ignore
+import pandas as pd # type: ignore
+import numpy as np # type: ignore
+from flask_cors import CORS # type: ignore
+
+from tensorflow.keras.models import load_model # type: ignore
+import lightkurve as lk # type: ignore
 
 app = Flask(__name__)
 CORS(app)
 
 # Load the trained model
-model = load('/Users/aditya/Desktop/Hackathon/A-World-Away-Hunting-for-Exoplanets-with-AI/backend/exoplanet_model.joblib')
+model = load_model('/Users/aditya/Desktop/Hackathon/A-World-Away-Hunting-for-Exoplanets-with-AI/backend/exoplanet_model_DL.h5')
 
-def preprocess_and_feature_engineer(lc_data):
-    # This function should mirror the preprocessing from your notebook
-    # For now, it's a placeholder.
-    # In a real application, you would reuse the exact same preprocessing steps.
-    
-    # Assuming lc_data is a dictionary with 'time' and 'flux'
-    # This is a simplified version of your notebook's feature engineering
-    
-    flux = np.array(lc_data['flux'])
-    
-    # Simple normalization
-    normalized_flux = flux / np.median(flux)
-    
-    # Basic trend removal (simplified)
-    flattened_flux = normalized_flux - np.mean(normalized_flux) + 1
+# Simple in-memory cache for light curve data
+light_curve_cache = {}
 
-    features = {
-        'std_dev_flux': np.std(flattened_flux),
-        'median_flux': np.median(flattened_flux),
-        'min_flux': np.min(flattened_flux),
-        'max_flux': np.max(flattened_flux),
-        'percentile_10': np.percentile(flattened_flux, 10),
-        'percentile_90': np.percentile(flattened_flux, 90),
-        'skewness_flux': pd.Series(flattened_flux).skew(),
-        'kurtosis_flux': pd.Series(flattened_flux).kurtosis()
-    }
-    
-    # Add folded features (placeholder)
-    for i in range(100):
-        features[f'folded_bin_{i}'] = 0
-        
-    return pd.DataFrame([features])
+BINS = 256
 
-@app.route('/predict', methods=['POST'])
-def predict():
+def process_light_curve(kepid, period):
+    """
+    Downloads, cleans, folds, and bins a Kepler light curve for a given ID and period.
+    Uses a cache to avoid re-downloading data.
+    """
+    if kepid in light_curve_cache:
+        # Use cached light curve object
+        lc = light_curve_cache[kepid]
+    else:
+        # Download and cache the light curve
+        try:
+            search_result = lk.search_lightcurve(f'KIC {kepid}', mission='Kepler')
+            lc_collection = search_result.download_all()
+            lc = lc_collection.stitch().remove_nans()
+            light_curve_cache[kepid] = lc
+        except Exception as e:
+            print(f"Error downloading or caching light curve for {kepid}: {e}")
+            return None
+
+    try:
+        flat_lc = lc.flatten(window_length=401)
+        folded_lc = flat_lc.fold(period=period)
+        binned_lc = folded_lc.bin(time_bin_size=period/BINS, n_bins=BINS)
+        normalized_flux = binned_lc.flux.value - np.median(binned_lc.flux.value)
+        if not np.all(np.isfinite(normalized_flux)):
+             return None
+        return normalized_flux
+    except Exception as e:
+        print(f"Error processing light curve for {kepid}: {e}")
+        return None
+
+@app.route('/predict_dl', methods=['POST'])
+def predict_dl():
     data = request.get_json()
-    
-    # The incoming data should be a light curve, e.g., {'time': [...], 'flux': [...]}
-    # We need to preprocess it to match the model's input format
-    features_df = preprocess_and_feature_engineer(data)
-    
+    kepid = data.get('kepid')
+    period = data.get('koi_period')
+
+    if not kepid or not period:
+        return jsonify({'error': 'kepid and koi_period are required'}), 400
+
+    flux_data = process_light_curve(kepid, period)
+
+    if flux_data is None:
+        return jsonify({'error': 'Could not process light curve for the given kepid and period'}), 500
+
+    # Reshape for the model
+    flux_data = np.array(flux_data).reshape(1, BINS, 1)
+
     # Predict
-    prediction = model.predict(features_df)
-    probability = model.predict_proba(features_df)[:, 1]
-    
+    probability = model.predict(flux_data)
+    prediction = (probability > 0.5).astype(int)
+
     return jsonify({
-        'prediction': int(prediction[0]),
-        'probability': float(probability[0])
+        'prediction': 'Exoplanet' if prediction[0][0] == 1 else 'False Positive',
+        'probability': float(probability[0][0])
     })
+
+@app.route('/', methods=['GET'])
+def home():
+    return "Welcome to the Exoplanet Detection API"
 
 if __name__ == '__main__':
     app.run(debug=True)
