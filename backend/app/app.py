@@ -21,6 +21,9 @@ ml_imputer = load('/Users/aditya/Desktop/Hackathon/A-World-Away-Hunting-for-Exop
 with open('/Users/aditya/Desktop/Hackathon/A-World-Away-Hunting-for-Exoplanets-with-AI/notebooks/models/selected_features_ML_dataset.json', 'r') as f:
     ml_features = json.load(f)
 
+# Load the dataset for period lookup
+kio_data = pd.read_csv('/Users/aditya/Desktop/Hackathon/A-World-Away-Hunting-for-Exoplanets-with-AI/notebooks/datasets/kio_cumulative_2025.10.04_03.15.13.csv')
+
 # Simple in-memory cache for light curve data
 light_curve_cache = {}
 
@@ -61,10 +64,20 @@ def process_light_curve(kepid, period):
 def predict_dl():
     data = request.get_json()
     kepid = data.get('kepid')
-    period = data.get('koi_period')
 
-    if not kepid or not period:
-        return jsonify({'error': 'kepid and koi_period are required'}), 400
+    if not kepid:
+        return jsonify({'error': 'kepid is required'}), 400
+
+    # Find the period from the dataset
+    star_data = kio_data[kio_data['kepid'] == kepid]
+    if star_data.empty:
+        return jsonify({'error': f'No data found for Kepler ID {kepid}'}), 404
+    
+    # Assuming the first entry is the one we want if there are multiple
+    period = star_data.iloc[0]['koi_period']
+
+    if pd.isna(period):
+        return jsonify({'error': f'Orbital period not available for Kepler ID {kepid}'}), 404
 
     flux_data = process_light_curve(kepid, period)
 
