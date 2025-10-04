@@ -52,7 +52,7 @@ def predict_ml():
 
 @app.route('/', methods=['GET'])
 def home():
-    return "Welcome to the Exoplanet Detection API"
+    return "Exoplanet Prediction API is running."
 
 if __name__ == '__main__':
     app.run(debug=True)
