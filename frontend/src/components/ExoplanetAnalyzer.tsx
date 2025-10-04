@@ -55,8 +55,8 @@ const ExoplanetAnalyzer = () => {
   });
 
   const handleAnalyze = async () => {
-    if (mode === 'search' && (!kepid || !koiPeriod)) {
-      setError('Please enter both a Kepler ID and an orbital period.');
+    if (mode === 'search' && !kepid) {
+      setError('Please enter a Kepler ID.');
       return;
     }
     setError(null);
@@ -69,8 +69,7 @@ const ExoplanetAnalyzer = () => {
     if (mode === 'search') {
       endpoint = 'http://127.0.0.1:5000/predict_dl';
       body = {
-        kepid: parseInt(kepid, 10),
-        koi_period: parseFloat(koiPeriod)
+        kepid: parseInt(kepid, 10)
       };
     } else {
       endpoint = 'http://127.0.0.1:5000/predict_ml';
@@ -140,7 +139,7 @@ const ExoplanetAnalyzer = () => {
 
   const canAnalyze = () => {
     if (mode === 'search') {
-      return !!kepid && !!koiPeriod;
+      return !!kepid;
     }
     if (mode === 'advanced') {
       return features.every(f => advancedInputs[f] && !isNaN(parseFloat(advancedInputs[f])));
@@ -169,7 +168,7 @@ const ExoplanetAnalyzer = () => {
         </TabsList>
         <TabsContent value="search">
           <Card className="p-6 bg-card/50 backdrop-blur-sm border-primary/20">
-            <div className="grid sm:grid-cols-2 gap-4 items-end">
+            <div className="grid sm:grid-cols-1 gap-4 items-end">
               <div>
                 <Label htmlFor="kepid" className="text-foreground">Kepler ID (kepid)</Label>
                 <Input 
@@ -178,17 +177,6 @@ const ExoplanetAnalyzer = () => {
                   placeholder="e.g., 11904151"
                   value={kepid}
                   onChange={(e) => setKepid(e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label htmlFor="koi_period" className="text-foreground">Orbital Period (days)</Label>
-                <Input
-                  id="koi_period"
-                  type="text"
-                  placeholder="e.g., 0.259862"
-                  value={koiPeriod}
-                  onChange={(e) => setKoiPeriod(e.target.value)}
                   className="mt-1"
                 />
               </div>
