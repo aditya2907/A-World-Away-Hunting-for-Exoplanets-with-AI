@@ -1,3 +1,4 @@
+import { Github } from "lucide-react";
 import Navbar from "@/components/Navbar";
 
 const About = () => {
@@ -27,6 +28,38 @@ const About = () => {
           <p>
             This project was developed by a passionate team of developers and data scientists with a shared love for space exploration and artificial intelligence.
           </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pt-4">
+            <div className="p-4 border rounded-lg text-center">
+              <a href="https://github.com/aditya2907" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 font-semibold hover:text-primary">
+                <Github className="w-5 h-5" />
+                Aditya Suryawanshi
+              </a>
+            </div>
+            <div className="p-4 border rounded-lg text-center">
+              <a href="https://github.com/Daditi" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 font-semibold hover:text-primary">
+                <Github className="w-5 h-5" />
+                Aditi Deshmukh
+              </a>
+            </div>
+            <div className="p-4 border rounded-lg text-center">
+              <a href="https://github.com/sohammyg" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 font-semibold hover:text-primary">
+                <Github className="w-5 h-5" />
+                Soham Maji
+              </a>
+            </div>
+            <div className="p-4 border rounded-lg text-center">
+              <a href="https://github.com/vaspayal" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 font-semibold hover:text-primary">
+                <Github className="w-5 h-5" />
+                Payal Vasvani
+              </a>
+            </div>
+            <div className="p-4 border rounded-lg text-center">
+              <a href="https://github.com/jyotirmoybanerjiportfolio771" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 font-semibold hover:text-primary">
+                <Github className="w-5 h-5" />
+                Jyotirmat Banarjee
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </>

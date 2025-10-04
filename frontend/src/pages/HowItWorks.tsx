@@ -20,12 +20,21 @@ const HowItWorks = () => {
             <p className="mt-2">
               The model analyzes a set of key features for each candidate object. These features include:
             </p>
-            <ul className="list-disc list-inside mt-2 space-y-1">
-              <li><strong>Orbital Period (koi_period):</strong> The time it takes for the planet to complete one orbit around its star.</li>
-              <li><strong>Transit Duration (koi_duration):</strong> The length of time the star's light dims during a transit.</li>
-              <li><strong>Transit Depth (koi_depth):</strong> The amount of light blocked by the planet, which relates to its size.</li>
-              <li><strong>Signal-to-Noise Ratio (koi_model_snr):</strong> A measure of the transit signal's strength relative to background noise.</li>
-              <li><strong>Stellar Properties (koi_steff, koi_slogg, koi_srad):</strong> Characteristics of the host star, such as its temperature, gravity, and radius.</li>
+            <ul className="list-disc list-inside mt-2 space-y-1 grid grid-cols-1 md:grid-cols-2 gap-x-8">
+              <li><strong>koi_period:</strong> Orbital period in days.</li>
+              <li><strong>koi_time0bk:</strong> Timing of the first transit.</li>
+              <li><strong>koi_impact:</strong> Impact parameter of the transit.</li>
+              <li><strong>koi_duration:</strong> Duration of the transit in hours.</li>
+              <li><strong>koi_depth:</strong> Depth of the transit in ppm.</li>
+              <li><strong>koi_prad:</strong> Planet radius in Earth radii.</li>
+              <li><strong>koi_teq:</strong> Planet's equilibrium temperature.</li>
+              <li><strong>koi_insol:</strong> Insolation flux (Earth flux units).</li>
+              <li><strong>koi_model_snr:</strong> Transit signal-to-noise ratio.</li>
+              <li><strong>koi_steff:</strong> Stellar effective temperature.</li>
+              <li><strong>koi_slogg:</strong> Stellar surface gravity.</li>
+              <li><strong>koi_srad:</strong> Stellar radius in Solar radii.</li>
+              <li><strong>ra:</strong> Right Ascension of the star.</li>
+              <li><strong>dec:</strong> Declination of the star.</li>
             </ul>
           </div>
           <div>
