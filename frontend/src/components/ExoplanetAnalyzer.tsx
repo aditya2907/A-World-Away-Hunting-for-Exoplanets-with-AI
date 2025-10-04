@@ -1,8 +1,6 @@
 import { useState } from 'react';
-import LightCurveChart from './LightCurveChart';
 import ConfidenceMeter from './ConfidenceMeter';
 import UserFeedback from './UserFeedback';
-import { generateLightCurve, generateFoldedCurve } from '@/utils/mockData';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -11,7 +9,7 @@ import { Card } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
 
-type Mode = 'search' | 'simple' | 'advanced';
+type Mode = 'simple' | 'advanced';
 
 // Define the features for the advanced form
 const features = [
@@ -38,9 +36,7 @@ const featureDefaults: Record<string, number> = {
 };
 
 const ExoplanetAnalyzer = () => {
-  const [mode, setMode] = useState<Mode>('search');
-  const [kepid, setKepid] = useState('');
-  const [koiPeriod, setKoiPeriod] = useState('');
+  const [mode, setMode] = useState<Mode>('simple');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [prediction, setPrediction] = useState<{ prediction: string; probability: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -55,46 +51,32 @@ const ExoplanetAnalyzer = () => {
   });
 
   const handleAnalyze = async () => {
-    if (mode === 'search' && !kepid) {
-      setError('Please enter a Kepler ID.');
-      return;
-    }
     setError(null);
     setIsAnalyzing(true);
     setPrediction(null);
 
-    let endpoint = '';
-    let body = {};
+    const endpoint = 'http://127.0.0.1:5000/predict_ml';
+    let features_to_send: Record<string, number | undefined> = {};
 
-    if (mode === 'search') {
-      endpoint = 'http://127.0.0.1:5000/predict_dl';
-      body = {
-        kepid: parseInt(kepid, 10)
+    if (mode === 'simple') {
+      features_to_send = {
+        ...featureDefaults,
+        ...simpleInputs
       };
-    } else {
-      endpoint = 'http://127.0.0.1:5000/predict_ml';
-      let features_to_send: Record<string, number | undefined> = {};
-
-      if (mode === 'simple') {
-        features_to_send = {
-          ...featureDefaults,
-          ...simpleInputs
-        };
-      } else { // advanced
-        features_to_send = Object.fromEntries(
-          features.map(f => [f, advancedInputs[f] ? parseFloat(advancedInputs[f]) : undefined])
-        );
-      }
-      
-      const missing_features = Object.entries(features_to_send).filter(([k, v]) => v === undefined || isNaN(v));
-      if (missing_features.length > 0) {
-        setError(`Please fill in all feature fields. Missing: ${missing_features.map(f => f[0]).join(', ')}`);
-        setIsAnalyzing(false);
-        return;
-      }
-
-      body = { features: features_to_send };
+    } else { // advanced
+      features_to_send = Object.fromEntries(
+        features.map(f => [f, advancedInputs[f] ? parseFloat(advancedInputs[f]) : undefined])
+      );
     }
+    
+    const missing_features = Object.entries(features_to_send).filter(([, v]) => v === undefined || isNaN(v));
+    if (missing_features.length > 0) {
+      setError(`Please fill in all feature fields. Missing: ${missing_features.map(f => f[0]).join(', ')}`);
+      setIsAnalyzing(false);
+      return;
+    }
+
+    const body = { features: features_to_send };
 
     try {
       const response = await fetch(endpoint, {
@@ -118,16 +100,25 @@ const ExoplanetAnalyzer = () => {
     }
   };
 
-  const handleFeedback = (isPlanet: boolean) => {
-    console.log(`User feedback for ${kepid}: ${isPlanet ? 'Planet' : 'False Positive'}`);
-    // In a real app, this would send data to backend
+  const handleReset = () => {
+    setIsAnalyzing(false);
+    setPrediction(null);
+    setError(null);
+    setAdvancedInputs(Object.fromEntries(features.map(f => [f, ''])));
+    setSimpleInputs({
+      koi_model_snr: featureDefaults.koi_model_snr,
+      koi_prad: featureDefaults.koi_prad,
+      koi_period: featureDefaults.koi_period,
+      koi_duration: featureDefaults.koi_duration,
+    });
   };
 
-  const isPlanet = prediction ? prediction.prediction !== 'False Positive' : true;
-  const confidence = prediction ? prediction.probability : 0;
+  const handleFeedback = (isPlanet: boolean) => {
+    console.log(`User feedback: ${isPlanet ? 'Planet' : 'False Positive'}`);
+  };
 
-  const lightCurveData = generateLightCurve(isPlanet);
-  const foldedCurveData = generateFoldedCurve();
+  const isPlanet = prediction ? prediction.prediction !== 'False Positive' : false;
+  const confidence = prediction ? prediction.probability : 0;
 
   const handleAdvancedInputChange = (feature: string, value: string) => {
     setAdvancedInputs(prev => ({ ...prev, [feature]: value }));
@@ -138,9 +129,6 @@ const ExoplanetAnalyzer = () => {
   };
 
   const canAnalyze = () => {
-    if (mode === 'search') {
-      return !!kepid;
-    }
     if (mode === 'advanced') {
       return features.every(f => advancedInputs[f] && !isNaN(parseFloat(advancedInputs[f])));
     }
@@ -156,33 +144,15 @@ const ExoplanetAnalyzer = () => {
           </span>
         </h2>
         <p className="text-muted-foreground max-w-2xl mx-auto">
-          Choose your analysis method. Search by Kepler ID, use simplified inputs, or provide all features for a detailed prediction.
+          Choose your analysis method. Use simplified inputs or provide all features for a detailed prediction.
         </p>
       </div>
 
-      <Tabs defaultValue="search" onValueChange={(value) => setMode(value as Mode)}>
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="search">Search by ID</TabsTrigger>
+      <Tabs defaultValue="simple" onValueChange={(value) => setMode(value as Mode)}>
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="simple">Simple Input</TabsTrigger>
           <TabsTrigger value="advanced">Advanced Input</TabsTrigger>
         </TabsList>
-        <TabsContent value="search">
-          <Card className="p-6 bg-card/50 backdrop-blur-sm border-primary/20">
-            <div className="grid sm:grid-cols-1 gap-4 items-end">
-              <div>
-                <Label htmlFor="kepid" className="text-foreground">Kepler ID (kepid)</Label>
-                <Input 
-                  id="kepid"
-                  type="text"
-                  placeholder="e.g., 11904151"
-                  value={kepid}
-                  onChange={(e) => setKepid(e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-            </div>
-          </Card>
-        </TabsContent>
         <TabsContent value="simple">
           <Card className="p-6 bg-card/50 backdrop-blur-sm border-primary/20">
             <div className="grid sm:grid-cols-2 gap-6">
@@ -236,7 +206,7 @@ const ExoplanetAnalyzer = () => {
             className="bg-primary hover:bg-primary/90 text-primary-foreground glow-border"
             disabled={!canAnalyze()}
           >
-            {mode === 'search' ? 'Analyze Light Curve' : 'Get Prediction'}
+            Get Prediction
           </Button>
         </div>
       )}
@@ -249,35 +219,29 @@ const ExoplanetAnalyzer = () => {
       )}
 
       {prediction && (
-        <>
-          {mode === 'search' && (
-            <div className="grid lg:grid-cols-2 gap-8 mt-8">
-              <LightCurveChart 
-                data={lightCurveData}
-                title="Raw vs Detrended Light Curve"
-                showDetrended={true}
-              />
-              
-              <LightCurveChart 
-                data={foldedCurveData}
-                title="Phase-Folded Transit"
-                showDetrended={false}
-              />
-            </div>
-          )}
+        <div className="grid lg:grid-cols-2 gap-8 mt-8">
+          <ConfidenceMeter 
+            confidence={confidence}
+            isPlanet={isPlanet}
+          />
+          
+          <UserFeedback 
+            starId={'Custom Input'}
+            onFeedback={handleFeedback}
+          />
+        </div>
+      )}
 
-          <div className="grid lg:grid-cols-2 gap-8 mt-8">
-            <ConfidenceMeter 
-              confidence={confidence}
-              isPlanet={isPlanet}
-            />
-            
-            <UserFeedback 
-              starId={kepid || 'Custom Input'}
-              onFeedback={handleFeedback}
-            />
-          </div>
-        </>
+      {prediction && !isAnalyzing && (
+        <div className="text-center mt-8">
+          <Button 
+            size="lg" 
+            onClick={handleReset}
+            variant="outline"
+          >
+            Reset
+          </Button>
+        </div>
       )}
     </div>
   );
