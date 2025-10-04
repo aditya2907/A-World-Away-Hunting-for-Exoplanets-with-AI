@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 from flask_cors import CORS
 import json
+import os
 import warnings
 
 warnings.filterwarnings("ignore")
@@ -11,11 +12,15 @@ warnings.filterwarnings("ignore")
 app = Flask(__name__)
 CORS(app)
 
+# Construct absolute paths to model files based on the location of this script
+base_dir = os.path.dirname(os.path.abspath(__file__))
+models_dir = os.path.join(base_dir, '..', 'models')
+
 # Load the trained models, scalers, and feature lists
-ml_model = load('/Users/aditya/Desktop/Hackathon/A-World-Away-Hunting-for-Exoplanets-with-AI/backend/models/exoplanet_model_ML_dataset.pkl')
-ml_scaler = load('/Users/aditya/Desktop/Hackathon/A-World-Away-Hunting-for-Exoplanets-with-AI/backend/models/scaler_ML_dataset.pkl')
-ml_imputer = load('/Users/aditya/Desktop/Hackathon/A-World-Away-Hunting-for-Exoplanets-with-AI/backend/models/imputer.pkl')
-with open('/Users/aditya/Desktop/Hackathon/A-World-Away-Hunting-for-Exoplanets-with-AI/backend/models/selected_features_ML_dataset.json', 'r') as f:
+ml_model = load(os.path.join(models_dir, 'exoplanet_model_ML_dataset.pkl'))
+ml_scaler = load(os.path.join(models_dir, 'scaler_ML_dataset.pkl'))
+ml_imputer = load(os.path.join(models_dir, 'imputer.pkl'))
+with open(os.path.join(models_dir, 'selected_features_ML_dataset.json'), 'r') as f:
     ml_features = json.load(f)
 
 @app.route('/predict_ml', methods=['POST'])
