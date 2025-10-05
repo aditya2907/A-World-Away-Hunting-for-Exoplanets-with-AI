@@ -2,6 +2,7 @@
   "name": "vite_react_shadcn_ts",
   "private": true,
   "version": "0.0.0",
+  "homepage": "https://aditya2907.github.io/A-World-Away-Hunting-for-Exoplanets-with-AI",
   "type": "module",
   "scripts": {
     "dev": "vite",
