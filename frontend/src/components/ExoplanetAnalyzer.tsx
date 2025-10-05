@@ -77,7 +77,7 @@ const ExoplanetAnalyzer = () => {
     setIsAnalyzing(true);
     setPrediction(null);
 
-    const endpoint = 'http://127.0.0.1:5000/predict_ml';
+    const endpoint = 'https://a-world-away-hunting-for-exoplanets-with-ai.onrender.com/predict_ml';
     let features_to_send: Record<string, number | undefined> = {};
 
     if (mode === 'simple') {
