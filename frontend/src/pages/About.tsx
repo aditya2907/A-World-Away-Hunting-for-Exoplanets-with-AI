@@ -9,27 +9,27 @@ const About = () => {
     {
       name: "Aditya Suryawanshi",
       github: "https://github.com/aditya2907",
-      avatar: "https://avatars.githubusercontent.com/u/88629002?v=4"
+      avatar: "https://github.com/aditya2907.png"
     },
     {
       name: "Aditi Deshmukh", 
       github: "https://github.com/Daditi",
-      avatar: "https://avatars.githubusercontent.com/u/1024025?v=4"
+      avatar: "https://github.com/Daditi.png"
     },
     {
       name: "Soham Maji",
       github: "https://github.com/sohammyg", 
-      avatar: "https://avatars.githubusercontent.com/u/1024025?v=4"
+      avatar: "https://github.com/sohammyg.png"
     },
     {
       name: "Payal Vaswani",
       github: "https://github.com/vaspayal",
-      avatar: "https://avatars.githubusercontent.com/u/1024025?v=4"
+      avatar: "https://github.com/vaspayal.png"
     },
     {
       name: "Jyotirmoy Banarjee",
       github: "https://github.com/jyotirmoybanerjiportfolio771",
-      avatar: "https://avatars.githubusercontent.com/u/1024025?v=4"
+      avatar: "https://github.com/jyotirmoybanerjiportfolio771.png"
     }
   ];
 
