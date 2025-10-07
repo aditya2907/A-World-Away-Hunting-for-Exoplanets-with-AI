@@ -7,3 +7,8 @@ flask-cors
 tensorflow
 lightkurve
 gunicorn
+Flask-SQLAlchemy
+Flask-Migrate
+Flask-Bcrypt
+Flask-JWT-Extended
+

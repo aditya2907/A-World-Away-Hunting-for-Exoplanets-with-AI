@@ -1,75 +1,175 @@
-import { Button } from "@/components/ui/button";
-import { Telescope } from "lucide-react";
+import { Button, Typography, Container, Box, Chip } from "@mui/material";
+import { Search } from "@mui/icons-material";
 import { Link } from "react-router-dom";
+import { useTheme } from "@mui/material/styles";
 
 const Hero = () => {
+  const theme = useTheme();
+  
   const scrollToAnalyzer = () => {
     document.getElementById('analyzer')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
-    <div className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
-      {/* Animated starfield background */}
-      <div className="absolute inset-0 starfield"></div>
-      
-      {/* Glow effect */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px] animate-pulse-slow"></div>
-      
-      <div className="container relative z-10 text-center space-y-8 px-4">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/30 bg-card/50 backdrop-blur-sm">
-          <Telescope className="w-4 h-4 text-primary" />
-          <span className="text-sm text-muted-foreground">AI-Powered Exoplanet Detection</span>
-        </div>
+    <Box
+      sx={{
+        position: 'relative',
+        minHeight: '80vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        background: `
+          radial-gradient(2px 2px at 20px 30px, white, transparent),
+          radial-gradient(2px 2px at 60px 70px, white, transparent),
+          radial-gradient(1px 1px at 50px 50px, white, transparent),
+          radial-gradient(1px 1px at 130px 80px, white, transparent),
+          radial-gradient(2px 2px at 90px 10px, white, transparent)
+        `,
+        backgroundSize: '200px 200px',
+        backgroundRepeat: 'repeat',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '500px',
+          height: '500px',
+          background: `${theme.palette.primary.main}10`,
+          borderRadius: '50%',
+          filter: 'blur(100px)',
+          animation: 'pulse 3s ease-in-out infinite',
+          '@keyframes pulse': {
+            '0%, 100%': { opacity: 0.5 },
+            '50%': { opacity: 0.8 },
+          },
+        },
+      }}
+    >
+      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, textAlign: 'center', py: 4 }}>
+        <Chip
+          icon={<Search />}
+          label="AI-Powered Exoplanet Detection"
+          variant="outlined"
+          sx={{
+            mb: 4,
+            backgroundColor: 'rgba(20, 20, 25, 0.5)',
+            backdropFilter: 'blur(10px)',
+            borderColor: `${theme.palette.primary.main}30`,
+            '& .MuiChip-icon': {
+              color: theme.palette.primary.main,
+            },
+          }}
+        />
         
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
-          <span className="glow-text">Discover New Worlds</span>
-          <br />
-          <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+        <Typography
+          variant="h1"
+          component="h1"
+          sx={{
+            fontSize: { xs: '3rem', md: '4.5rem' },
+            fontWeight: 'bold',
+            letterSpacing: '-0.025em',
+            mb: 3,
+          }}
+        >
+          <Box
+            component="span"
+            sx={{
+              display: 'block',
+              textShadow: `0 0 20px ${theme.palette.primary.main}50`,
+            }}
+          >
+            Discover New Worlds
+          </Box>
+          <Box
+            component="span"
+            sx={{
+              background: 'linear-gradient(135deg, #3AAED8, #B47CED)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          >
             With Machine Learning
-          </span>
-        </h1>
+          </Box>
+        </Typography>
         
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+        <Typography
+          variant="h5"
+          color="text.secondary"
+          sx={{ maxWidth: '600px', mx: 'auto', mb: 4 }}
+        >
           Analyze light curves from NASA's Kepler and TESS missions. Our neural network identifies 
           potential exoplanets with unprecedented accuracy.
-        </p>
+        </Typography>
         
-        <div className="flex gap-4 justify-center flex-wrap">
+        <Box display="flex" gap={2} justifyContent="center" flexWrap="wrap" mb={6}>
           <Button 
-            size="lg" 
+            size="large" 
             onClick={scrollToAnalyzer}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground glow-border"
+            variant="contained"
+            sx={{
+              background: 'linear-gradient(135deg, #3AAED8, #B47CED)',
+              boxShadow: `0 4px 16px ${theme.palette.primary.main}30`,
+              '&:hover': {
+                background: 'linear-gradient(135deg, #2A7FA3, #8E5CB8)',
+                boxShadow: `0 6px 20px ${theme.palette.primary.main}40`,
+              },
+            }}
           >
             Start Detection
           </Button>
-          <Link to="/about">
-            <Button 
-              size="lg" 
-              variant="outline"
-              className="border-primary/30 hover:bg-primary/10"
-            >
-              Learn More
-            </Button>
-          </Link>
-        </div>
+          <Button 
+            size="large" 
+            variant="outlined"
+            component={Link}
+            to="/about"
+            sx={{
+              borderColor: `${theme.palette.primary.main}30`,
+              '&:hover': {
+                backgroundColor: `${theme.palette.primary.main}10`,
+                borderColor: theme.palette.primary.main,
+              },
+            }}
+          >
+            Learn More
+          </Button>
+        </Box>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-12 max-w-3xl mx-auto">
-          <div className="space-y-2">
-            <div className="text-3xl font-bold text-primary">96%</div>
-            <div className="text-sm text-muted-foreground">Detection Accuracy</div>
-          </div>
-          <div className="space-y-2">
-            <div className="text-3xl font-bold text-secondary">5,000+</div>
-            <div className="text-sm text-muted-foreground">Light Curves Analyzed</div>
-          </div>
-          <div className="space-y-2">
-            <div className="text-3xl font-bold text-success">127</div>
-            <div className="text-sm text-muted-foreground">Planets Confirmed</div>
-          </div>
-        </div>
-      </div>
-    </div>
+        <Box 
+          display="grid" 
+          gridTemplateColumns={{ xs: '1fr', md: 'repeat(3, 1fr)' }} 
+          gap={4} 
+          sx={{ pt: 6, maxWidth: '600px', mx: 'auto' }}
+        >
+          <Box textAlign="center">
+            <Typography variant="h3" fontWeight="bold" color="primary.main">
+              96%
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Detection Accuracy
+            </Typography>
+          </Box>
+          <Box textAlign="center">
+            <Typography variant="h3" fontWeight="bold" color="secondary.main">
+              5,000+
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Light Curves Analyzed
+            </Typography>
+          </Box>
+          <Box textAlign="center">
+            <Typography variant="h3" fontWeight="bold" color="success.main">
+              127
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Planets Confirmed
+            </Typography>
+          </Box>
+        </Box>
+      </Container>
+    </Box>
   );
 };
 

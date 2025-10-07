@@ -6,3 +6,5 @@ This solution directly addresses the challenge of analyzing the immense volume o
 
 The importance of this project lies in its ability to accelerate the search for new worlds. By making exoplanet detection faster and more accessible, we can more efficiently identify targets for further study, which is a critical step in the ongoing quest to find habitable planets and potentially, life beyond Earth.
 
+### project live : https://exospace.netlify.app/
+### backend API : https://a-world-away-hunting-for-exoplanets-with.onrender.com
