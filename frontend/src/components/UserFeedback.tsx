@@ -1,72 +1,130 @@
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { ThumbsUp, XCircle } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { 
+  Button, 
+  Card, 
+  CardContent, 
+  Typography, 
+  Box, 
+  Snackbar, 
+  Alert,
+  Fade
+} from '@mui/material';
+import { ThumbUp, Cancel } from '@mui/icons-material';
+import { useTheme } from '@mui/material/styles';
 
 interface UserFeedbackProps {
-  starId: string;
   onFeedback: (isPlanet: boolean) => void;
 }
 
-const UserFeedback = ({ starId, onFeedback }: UserFeedbackProps) => {
+const UserFeedback = ({ onFeedback }: UserFeedbackProps) => {
   const [selected, setSelected] = useState<boolean | null>(null);
-  const { toast } = useToast();
+  const [showSnackbar, setShowSnackbar] = useState(false);
+  const theme = useTheme();
 
   const handleFeedback = (isPlanet: boolean) => {
     setSelected(isPlanet);
     onFeedback(isPlanet);
-    toast({
-      title: "Feedback Recorded",
-      description: `Thank you! Your input helps train our AI model.`,
-    });
+    setShowSnackbar(true);
   };
 
   return (
-    <Card className="p-6 bg-card/50 backdrop-blur-sm border-primary/20">
-      <div className="space-y-4">
-        <div className="text-center space-y-2">
-          <h3 className="text-xl font-semibold text-foreground">Human Validation</h3>
-          <p className="text-muted-foreground">Do you think this is a planet?</p>
-        </div>
+    <>
+      <Card>
+        <CardContent sx={{ p: 4 }}>
+          <Box textAlign="center" mb={3}>
+            <Typography variant="h5" component="h3" fontWeight="semibold" gutterBottom>
+              Human Validation
+            </Typography>
+            <Typography color="text.secondary">
+              Do you think this is a planet?
+            </Typography>
+          </Box>
 
-        <div className="flex gap-4 justify-center">
-          <Button
-            size="lg"
-            variant={selected === true ? "default" : "outline"}
-            onClick={() => handleFeedback(true)}
-            className={`flex-1 max-w-[200px] ${
-              selected === true 
-                ? 'bg-success hover:bg-success/90 border-success text-success-foreground' 
-                : 'border-success/30 hover:bg-success/10'
-            }`}
-          >
-            <ThumbsUp className="w-5 h-5 mr-2" />
-            Yes, Planet
-          </Button>
-          
-          <Button
-            size="lg"
-            variant={selected === false ? "default" : "outline"}
-            onClick={() => handleFeedback(false)}
-            className={`flex-1 max-w-[200px] ${
-              selected === false 
-                ? 'bg-destructive hover:bg-destructive/90 border-destructive' 
-                : 'border-destructive/30 hover:bg-destructive/10'
-            }`}
-          >
-            <XCircle className="w-5 h-5 mr-2" />
-            No, False Positive
-          </Button>
-        </div>
+          <Box display="flex" gap={2} justifyContent="center">
+            <Button
+              size="large"
+              variant={selected === true ? "contained" : "outlined"}
+              onClick={() => handleFeedback(true)}
+              startIcon={<ThumbUp />}
+              sx={{
+                flex: 1,
+                maxWidth: 200,
+                ...(selected === true && {
+                  backgroundColor: theme.palette.success.main,
+                  '&:hover': {
+                    backgroundColor: theme.palette.success.dark,
+                  },
+                }),
+                ...(selected !== true && {
+                  borderColor: theme.palette.success.main,
+                  color: theme.palette.success.main,
+                  '&:hover': {
+                    backgroundColor: `${theme.palette.success.main}10`,
+                    borderColor: theme.palette.success.main,
+                  },
+                }),
+              }}
+            >
+              Yes, Planet
+            </Button>
+            
+            <Button
+              size="large"
+              variant={selected === false ? "contained" : "outlined"}
+              onClick={() => handleFeedback(false)}
+              startIcon={<Cancel />}
+              sx={{
+                flex: 1,
+                maxWidth: 200,
+                ...(selected === false && {
+                  backgroundColor: theme.palette.error.main,
+                  '&:hover': {
+                    backgroundColor: theme.palette.error.dark,
+                  },
+                }),
+                ...(selected !== false && {
+                  borderColor: theme.palette.error.main,
+                  color: theme.palette.error.main,
+                  '&:hover': {
+                    backgroundColor: `${theme.palette.error.main}10`,
+                    borderColor: theme.palette.error.main,
+                  },
+                }),
+              }}
+            >
+              No, False Positive
+            </Button>
+          </Box>
 
-        {selected !== null && (
-          <div className="text-center text-sm text-muted-foreground animate-in fade-in">
-            Your feedback has been recorded for star {starId}
-          </div>
-        )}
-      </div>
-    </Card>
+          {selected !== null && (
+            <Fade in timeout={500}>
+              <Typography 
+                textAlign="center" 
+                variant="body2" 
+                color="text.secondary" 
+                sx={{ mt: 2 }}
+              >
+                Your feedback has been recorded.
+              </Typography>
+            </Fade>
+          )}
+        </CardContent>
+      </Card>
+
+      <Snackbar
+        open={showSnackbar}
+        autoHideDuration={3000}
+        onClose={() => setShowSnackbar(false)}
+      >
+        <Alert 
+          onClose={() => setShowSnackbar(false)} 
+          severity="success" 
+          variant="filled"
+        >
+          Thank you! Your input helps train our AI model.
+        </Alert>
+      </Snackbar>
+    </>
   );
 };
 
